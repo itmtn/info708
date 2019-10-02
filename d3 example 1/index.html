@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.js"></script>
+    <title>D3 demonstration graph</title>
+</head>
+<body>
+
+<script>
+
+    // set dimensions of graph
+    let margin = {top: 20, right: 20, bottom: 30, left: 50};
+    let width = 960 - margin.left - margin.right;
+    let height = 500 - margin.top - margin.bottom;
+
+    let x = d3.scaleLinear().range([0, width]);
+    let y = d3.scaleLinear().range([height, 0]);
+
+
+    // append the svg obgect to the body of the page
+    // appends a 'group' element to 'svg'
+    // moves the 'group' element to the top left margin
+    let svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g").attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.csv("data.csv").then(function(data){
+
+        // parse
+        data.forEach(function(d){
+            d.Age = +d.Age;
+            d.Horizontal_jump_Best = +d.Horizontal_jump_Best;
+            console.log(d.Age, d.Horizontal_jump_Best);
+        });
+
+        // d3 extent gets min and max value in a data array
+        x.domain(d3.extent(data, function(d) { return d.Age; }));
+        y.domain([0, d3.max(data, function(d) { return d.Horizontal_jump_Best; })]);
+
+        // Add the scatterplot
+        svg.selectAll("circle")
+            .data(data)
+            .enter().append("circle")
+            .attr("r", 3.5)
+            .attr("cx", function(d) { return x(d.Age); })
+            .attr("cy", function(d) { return y(d.Horizontal_jump_Best); });
+
+        // Add the X Axis
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the Y Axis
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+    });
+
+    
+
+</script>
+    
+
+
+</body>
+</html>
